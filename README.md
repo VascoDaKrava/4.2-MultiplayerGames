@@ -1,4 +1,1 @@
-# 4.2-MultiplayerGames
-Net201022
-
-My Game Studio / My Game
+Название компании и тайтла - GB-MPG-4.2
