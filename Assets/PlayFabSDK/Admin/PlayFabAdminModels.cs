@@ -565,6 +565,19 @@ namespace PlayFab.AdminModels
         public int Amount;
     }
 
+    [Serializable]
+    public class ChurnPredictionSegmentFilter : PlayFabBaseModel
+    {
+        /// <summary>
+        /// Comparison
+        /// </summary>
+        public SegmentFilterComparison? Comparison;
+        /// <summary>
+        /// RiskLevel
+        /// </summary>
+        public ChurnRiskLevel? RiskLevel;
+    }
+
     public enum ChurnRiskLevel
     {
         NoData,
@@ -2393,9 +2406,9 @@ namespace PlayFab.AdminModels
         AutomationRuleAlreadyExists,
         AutomationRuleLimitExceeded,
         InvalidGooglePlayGamesServerAuthCode,
-        StorageAccountNotFound,
         PlayStreamConnectionFailed,
         InvalidEventContents,
+        InsightsV1Deprecated,
         MatchmakingEntityInvalid,
         MatchmakingPlayerAttributesInvalid,
         MatchmakingQueueNotFound,
@@ -2998,7 +3011,14 @@ namespace PlayFab.AdminModels
         /// </summary>
         public Dictionary<string,string> CustomTags;
         /// <summary>
-        /// Maximum number of profiles to load. Default is 1,000. Maximum is 10,000.
+        /// If set to true, the profiles are loaded asynchronously and the response will include a continuation token and
+        /// approximate profile count until the first batch of profiles is loaded. Use this parameter to help avoid network
+        /// timeouts.
+        /// </summary>
+        public bool? GetProfilesAsync;
+        /// <summary>
+        /// Maximum is 10,000. The value 0 will prevent loading any profiles and return only the count of profiles matching this
+        /// segment.
         /// </summary>
         public uint? MaxBatchSize;
         /// <summary>
@@ -4378,6 +4398,10 @@ namespace PlayFab.AdminModels
         /// </summary>
         public DateTime? BannedUntil;
         /// <summary>
+        /// The prediction of the player to churn within the next seven days.
+        /// </summary>
+        public ChurnRiskLevel? ChurnPrediction;
+        /// <summary>
         /// Array of contact email addresses associated with the player
         /// </summary>
         public List<ContactEmailInfo> ContactEmailAddresses;
@@ -5222,6 +5246,10 @@ namespace PlayFab.AdminModels
         /// </summary>
         public AllPlayersSegmentFilter AllPlayersFilter;
         /// <summary>
+        /// Filter property for player churn risk level.
+        /// </summary>
+        public ChurnPredictionSegmentFilter ChurnPredictionFilter;
+        /// <summary>
         /// Filter property for first login date.
         /// </summary>
         public FirstLoginDateSegmentFilter FirstLoginDateFilter;
@@ -5995,11 +6023,8 @@ namespace PlayFab.AdminModels
     }
 
     /// <summary>
-    /// This API method is designed to store title specific values which can be read by the client. For example, a developer
-    /// could choose to store values which modify the user experience, such as enemy spawn rates, weapon strengths, movement
-    /// speeds, etc. This allows a developer to update the title without the need to create, test, and ship a new build. This
-    /// operation is additive. If a Key does not exist in the current dataset, it will be added with the specified Value. If it
-    /// already exists, the Value for that key will be overwritten with the new Value.
+    /// This operation is additive. If a Key does not exist in the current dataset, it will be added with the specified Value.
+    /// If it already exists, the Value for that key will be overwritten with the new Value.
     /// </summary>
     [Serializable]
     public class SetTitleDataRequest : PlayFabRequestCommon
