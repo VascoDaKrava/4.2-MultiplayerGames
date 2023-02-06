@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DevAccountEmail: kravchuk.wesley@gmail.com
   DevAccountToken: xep7optbso768ya7w7qna9jpkxdyo81xpot5rdkuau8dk5bwxethgqjr6669tfxy91hfcrnfsqcamoy6u3casfn1mgueqwtsq9g5ix8wxmizqywr6efd8dcef9jjnbq5ddb3rtbizdqizibjirhgkweakpo68ui13mcm781p4epehdryur9stba73xsyqa4imhyyd53s
-  SelectedStudio: 
+  SelectedStudio: VascoGameStudio
   SdkPath: Assets/PlayFabSDK
   EdExPath: 
   LocalCloudScriptPath: 
   PanelIsShown: 0
-  curMainMenuIdx: 0
+  curMainMenuIdx: 1
   curSubMenuIdx: 0

@@ -2,11 +2,10 @@ using Photon.Pun;
 using Photon.Realtime;
 using PlayFab;
 using PlayFab.ClientModels;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class Authorization : MonoBehaviourPunCallbacks
+
+public sealed class Authorization : MonoBehaviourPunCallbacks
 {
     [SerializeField] private string _playFabTitle;
 
@@ -51,8 +50,11 @@ public class Authorization : MonoBehaviourPunCallbacks
     {
         base.OnConnectedToMaster();
         Debug.Log("OnConnectedToMaster");
+
         if (!PhotonNetwork.InRoom)
+        {
             PhotonNetwork.JoinRandomOrCreateRoom(roomName: $"Room N{Random.Range(0, 9999)}");
+        }
     }
 
     public override void OnCreatedRoom()
