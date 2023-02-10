@@ -32,6 +32,8 @@ public sealed class UIView : MonoBehaviour
 
     [SerializeField] private TMP_Text _userDataButtonLabel;
 
+    [SerializeField] public TMP_Text UserIDText;
+
     #endregion
 
 
@@ -52,6 +54,8 @@ public sealed class UIView : MonoBehaviour
     [field: SerializeField] public TMP_InputField EmailField { get; private set; }
 
     [field: SerializeField] public Button UserDataButton { get; private set; }
+    [field: SerializeField] public Button LoginIDUserDataButton { get; private set; }
+    [field: SerializeField] public Button MainResetButton { get; private set; }
 
     #endregion
 
@@ -103,6 +107,7 @@ public sealed class UIView : MonoBehaviour
         HideAll();
         _userDataContainer.gameObject.SetActive(true);
         EmailField.gameObject.SetActive(false);
+        LoginIDUserDataButton.gameObject.SetActive(true);
         _userDataButtonLabel.text = LOGIN_BUTTON_TEXT;
         LabelText.text = LABEL_LOGIN;
     }
@@ -111,6 +116,7 @@ public sealed class UIView : MonoBehaviour
     {
         HideAll();
         _userDataContainer.gameObject.SetActive(true);
+        LoginIDUserDataButton.gameObject.SetActive(false);
         EmailField.gameObject.SetActive(true);
         _userDataButtonLabel.text = REGISTER_BUTTON_TEXT;
         LabelText.text = LABEL_REGISTER;
