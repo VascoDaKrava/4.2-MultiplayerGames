@@ -2,6 +2,8 @@ using PlayFab.ClientModels;
 using PlayFab;
 using UnityEngine;
 using System;
+using UnityEngine.SceneManagement;
+using System.Collections;
 
 public sealed class ServerAuthorization : MonoBehaviour
 {
@@ -9,6 +11,7 @@ public sealed class ServerAuthorization : MonoBehaviour
     #region Fields
 
     private const string AUTHORIZATION_KEY = "authorization-guid";
+    private const int LOBBY_SCENE_ID = 1;
 
     [SerializeField] private UIView _ui;
 
@@ -57,20 +60,25 @@ public sealed class ServerAuthorization : MonoBehaviour
 
     private void OnLoginIDUserDataButtonClickHandler()
     {
+        _ui.ShowProgress(true);
+
         PlayFabClientAPI.LoginWithCustomID(new LoginWithCustomIDRequest()
         {
             CustomId = _userID,
             CreateAccount = _needCreateNewAccount
         },
-        success => {
+
+        success =>
+        {
             var message = success.NewlyCreated ? "Create and login succes" : "Login success";
             Debug.Log(message);
             _ui.LabelText.color = Color.green;
             _ui.LabelText.text = message;
             PlayerPrefs.SetString(AUTHORIZATION_KEY, _userID);
+            StartCoroutine(LoadLobby());
         },
-        OnErrorHandler
-        );
+
+        OnErrorHandler);
     }
 
     private void OnUserDataButtonClickHandler()
@@ -94,15 +102,21 @@ public sealed class ServerAuthorization : MonoBehaviour
             Email = _ui.EmailField.text,
             RequireBothUsernameAndEmail = true
         },
+
         result =>
         {
+            _ui.LabelText.color = Color.green;
+            _ui.LabelText.text = $"Success create : {_ui.LoginField.text}";
             Debug.Log($"Success create : {_ui.LoginField.text}");
         },
+
         OnErrorHandler);
     }
 
     private void SignIn()
     {
+        _ui.ShowProgress(true);
+
         PlayFabClientAPI.LoginWithPlayFab(new LoginWithPlayFabRequest
         {
             Username = _ui.LoginField.text,
@@ -112,15 +126,16 @@ public sealed class ServerAuthorization : MonoBehaviour
         result =>
         {
             Debug.Log($"Success login : {_ui.LoginField.text}");
+            StartCoroutine(LoadLobby());
         },
 
         OnErrorHandler);
     }
 
-
-
     private void OnErrorHandler(PlayFabError error)
     {
+        _ui.ShowProgress(false);
+
         _ui.LabelText.color = Color.red;
         _ui.LabelText.text = error.GenerateErrorReport();
 
@@ -138,9 +153,19 @@ public sealed class ServerAuthorization : MonoBehaviour
         }
     }
 
-    private void SaveAuthLocal()
+    private IEnumerator LoadLobby()
     {
-        PlayerPrefs.SetString(AUTHORIZATION_KEY, _userID);
+        _ui.LabelText.text = "Load lobby";
+        _ui.LabelText.color = Color.white;
+
+        var progress = SceneManager.LoadSceneAsync(LOBBY_SCENE_ID);
+
+        while (!progress.isDone)
+        {
+            yield return null;
+        }
+
+        _ui.ShowProgress(false);
     }
 
     #endregion

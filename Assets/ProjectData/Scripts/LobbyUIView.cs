@@ -39,10 +39,10 @@ public sealed class LobbyUIView : MonoBehaviour
     private void OnGetAccountSuccess(GetAccountInfoResult result)
     {
         _titleLabel.text =
-            $"Welcome back!" +
-            $"PlayFabId : {result.AccountInfo.PlayFabId}" +
-            $"Username : {result.AccountInfo.Username}" +
-            $"CustomIdInfo : {result.AccountInfo.CustomIdInfo}" +
+            $"Welcome back!\n\n" +
+            $"PlayFabId : {result.AccountInfo.PlayFabId}\n\n" +
+            $"Username : {result.AccountInfo.Username}\n\n" +
+            $"CustomIdInfo : {result.AccountInfo.CustomIdInfo}\n\n" +
             $"";
     }
 

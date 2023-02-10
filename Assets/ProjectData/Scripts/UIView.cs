@@ -13,6 +13,7 @@ public sealed class UIView : MonoBehaviour
     private const string LABEL_LOGIN = "Login now";
     private const string LABEL_REGISTER = "Create account";
     private const string LABEL_LESSON_3 = "Please log in";
+    private const string LABEL_TRY_LOGIN = "Login in progress";
 
     private const string LOGIN_BUTTON_TEXT = "LOGIN";
     private const string REGISTER_BUTTON_TEXT = "REGISTER";
@@ -22,6 +23,7 @@ public sealed class UIView : MonoBehaviour
     [SerializeField] private RectTransform _buttonsLesson3Container;
     [SerializeField] private RectTransform _mainButtonsContainer;
     [SerializeField] private RectTransform _userDataContainer;
+    [SerializeField] private RectTransform _progressContainer;
 
     [SerializeField] private Button _backUserDataButton;
     [SerializeField] private Button _backFromLesson3Button;
@@ -31,6 +33,8 @@ public sealed class UIView : MonoBehaviour
     [SerializeField] private Button _mainLesson3Button;
 
     [SerializeField] private TMP_Text _userDataButtonLabel;
+
+    [SerializeField] private Animation _progressAnimation;
 
     [SerializeField] public TMP_Text UserIDText;
 
@@ -67,6 +71,7 @@ public sealed class UIView : MonoBehaviour
         _containers.Add(_mainButtonsContainer);
         _containers.Add(_buttonsLesson3Container);
         _containers.Add(_userDataContainer);
+        _containers.Add(_progressContainer);
 
         ShowMainMenu();
     }
@@ -134,6 +139,15 @@ public sealed class UIView : MonoBehaviour
         HideAll();
         _mainButtonsContainer.gameObject.SetActive(true);
         LabelText.text = LABEL_MAIN;
+        LabelText.color = Color.white;
+    }
+
+    public void ShowProgress(bool state)
+    {
+        //HideAll();
+        _progressContainer.gameObject.SetActive(state);
+        
+        LabelText.text = LABEL_TRY_LOGIN;
         LabelText.color = Color.white;
     }
 
