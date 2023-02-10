@@ -42,7 +42,7 @@ public sealed class LobbyUIView : MonoBehaviour
             $"Welcome back!\n\n" +
             $"PlayFabId : {result.AccountInfo.PlayFabId}\n\n" +
             $"Username : {result.AccountInfo.Username}\n\n" +
-            $"CustomIdInfo : {result.AccountInfo.CustomIdInfo}\n\n" +
+            $"CustomId : {result.AccountInfo.CustomIdInfo.CustomId}\n\n" +
             $"";
     }
 
