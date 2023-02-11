@@ -7,15 +7,32 @@ using UnityEngine;
 public sealed class CatalogLoader : MonoBehaviour
 {
 
+    #region Fields
+
+    [SerializeField] private LobbyUIView _ui;
+    private const string CATALOG_VERSION = "NewCatalog";// Version/name as PlayFab web creation
     private readonly Dictionary<string, CatalogItem> _catalog = new Dictionary<string, CatalogItem>();
+
+    #endregion
+
+
+    #region UnityMethods
 
     private void Start()
     {
+        var request = new GetCatalogItemsRequest();
+        request.CatalogVersion = CATALOG_VERSION;
+
         PlayFabClientAPI.GetCatalogItems(
-            new GetCatalogItemsRequest(),
+            request,
             OnGetCatalogSuccess,
             OnFailure);
     }
+
+    #endregion
+
+
+    #region Methods
 
     private void OnFailure(PlayFabError error)
     {
@@ -25,6 +42,7 @@ public sealed class CatalogLoader : MonoBehaviour
 
     private void OnGetCatalogSuccess(GetCatalogItemsResult result)
     {
+        _ui.FillCatalog(result.Catalog);
         HandleCatalog(result.Catalog);
         Debug.Log($"Catalog was loaded successfully!");
     }
@@ -37,4 +55,7 @@ public sealed class CatalogLoader : MonoBehaviour
             Debug.Log($"Catalog item {item.ItemId} was added successfully!");
         }
     }
+
+    #endregion
+
 }
