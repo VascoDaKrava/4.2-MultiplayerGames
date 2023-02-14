@@ -43,6 +43,8 @@ public class RoomsController : MonoBehaviourPunCallbacks
 
     private const int ROOM_NUMBER_MIN = 1000;
     private const int ROOM_NUMBER_MAX = 10000;
+    private const byte MAX_PLAYERS_MIN = 2;
+    private const byte MAX_PLAYERS_MAX = 20;
     private const int PLAYER_TTL = 10000;
 
     [SerializeField] private RoomsUIView _ui;
@@ -66,6 +68,7 @@ public class RoomsController : MonoBehaviourPunCallbacks
         _ui.StartGameButton.onClick.AddListener(OnClickStartGameButtonHandler);
         _ui.CreateOrJoinCustomRoomButton.onClick.AddListener(OnClickCreateCustomRoomButtonHandler);
         _ui.CreateOrJoinRandomRoomButton.onClick.AddListener(OnClickCreateRandomRoomButtonHandler);
+        _ui.IsRoomLock.onValueChanged.AddListener(OnUIvalueChangeRoomLockHandler);
     }
 
     public override void OnDisable()
@@ -74,6 +77,7 @@ public class RoomsController : MonoBehaviourPunCallbacks
         _ui.StartGameButton.onClick.RemoveAllListeners();
         _ui.CreateOrJoinCustomRoomButton.onClick.RemoveAllListeners();
         _ui.CreateOrJoinRandomRoomButton.onClick.RemoveAllListeners();
+        _ui.IsRoomLock.onValueChanged.RemoveAllListeners();
         Disconnect();
     }
 
@@ -161,7 +165,7 @@ public class RoomsController : MonoBehaviourPunCallbacks
 
     private void OnClickStartGameButtonHandler()
     {
-        if (!PhotonNetwork.IsConnectedAndReady)
+        if (!PhotonNetwork.InRoom)
         {
             OnClickCreateCustomRoomButtonHandler();
         }
@@ -187,7 +191,18 @@ public class RoomsController : MonoBehaviourPunCallbacks
     {
         PhotonNetwork.LocalPlayer.NickName = _userName;
         roomName = _ui.RoomName.text.Equals(string.Empty) ? $"Room {Random.Range(ROOM_NUMBER_MIN, ROOM_NUMBER_MAX)}" : _ui.RoomName.text;
-        roomOptions = new RoomOptions { MaxPlayers = _ui.MaxPlayers, PlayerTtl = PLAYER_TTL, IsOpen = _ui.IsRoomLock };
+        byte maxPlayers;
+
+        if (_ui.MaxPlayers < MAX_PLAYERS_MIN || _ui.MaxPlayers > MAX_PLAYERS_MAX)
+        {
+            maxPlayers = (byte)(Random.Range(MAX_PLAYERS_MIN, MAX_PLAYERS_MAX));
+        }
+        else
+        {
+            maxPlayers = _ui.MaxPlayers;
+        }
+
+        roomOptions = new RoomOptions { MaxPlayers = maxPlayers, PlayerTtl = PLAYER_TTL, IsOpen = !_ui.IsRoomLock.isOn };
     }
 
     private void Connect()
@@ -207,6 +222,17 @@ public class RoomsController : MonoBehaviourPunCallbacks
     {
         PhotonNetwork.Disconnect();
         Debug.Log("Disconnect from PUN");
+    }
+
+    private void OnUIvalueChangeRoomLockHandler(bool state)
+    {
+        if (!PhotonNetwork.InRoom)
+        {
+            return;
+        }
+
+        PhotonNetwork.CurrentRoom.IsOpen = !state;
+        _ui.UpdateCurrentRoomInfo(PhotonNetwork.CurrentRoom);
     }
 
     #endregion
