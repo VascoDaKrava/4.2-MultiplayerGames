@@ -64,12 +64,16 @@ public class RoomsController : MonoBehaviourPunCallbacks
     {
         base.OnEnable();
         _ui.StartGameButton.onClick.AddListener(OnClickStartGameButtonHandler);
+        _ui.CreateOrJoinCustomRoomButton.onClick.AddListener(OnClickCreateCustomRoomButtonHandler);
+        _ui.CreateOrJoinRandomRoomButton.onClick.AddListener(OnClickCreateRandomRoomButtonHandler);
     }
 
     public override void OnDisable()
     {
         base.OnDisable();
         _ui.StartGameButton.onClick.RemoveAllListeners();
+        _ui.CreateOrJoinCustomRoomButton.onClick.RemoveAllListeners();
+        _ui.CreateOrJoinRandomRoomButton.onClick.RemoveAllListeners();
         Disconnect();
     }
 
@@ -78,14 +82,41 @@ public class RoomsController : MonoBehaviourPunCallbacks
 
     #region PUN Callbacks
 
+    public override void OnConnectedToMaster()
+    {
+        base.OnConnectedToMaster();
+        Debug.Log("OnConnectedToMaster");
+        PhotonNetwork.JoinLobby();
+    }
+
+    public override void OnJoinedLobby()
+    {
+        base.OnJoinedLobby();
+        Debug.Log("OnJoinedLobby");
+        _ui.IsInLobby = PhotonNetwork.InLobby;
+    }
+
+    public override void OnLeftLobby()
+    {
+        base.OnLeftLobby();
+        Debug.Log("OnLeftLobby");
+        _ui.IsInLobby = PhotonNetwork.InLobby;
+    }
+
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
         base.OnRoomListUpdate(roomList);
+        _ui.FillRooms(roomList);
+        Debug.Log($"OnRoomListUpdate {roomList.Count}");
     }
 
-    public override void OnPlayerEnteredRoom(Player newPlayer)
+    public override void OnPlayerEnteredRoom(Player otherPlayer)
     {
-        base.OnPlayerEnteredRoom(newPlayer);
+        base.OnPlayerEnteredRoom(otherPlayer);
+        Debug.LogFormat("<color=aqua>Joined NickName : {0}</color>", otherPlayer.NickName);
+        Debug.LogFormat("<color=cyan>Full : {0}</color>", otherPlayer.ToStringFull());
+        _ui.IsInLobby = PhotonNetwork.InLobby;
+        _ui.UpdateCurrentRoomInfo(PhotonNetwork.CurrentRoom);
     }
 
     public override void OnJoinedRoom()
@@ -94,6 +125,8 @@ public class RoomsController : MonoBehaviourPunCallbacks
         Debug.Log($"Join to {PhotonNetwork.CurrentRoom.Name}");
         Debug.Log($"Max players {PhotonNetwork.CurrentRoom.MaxPlayers}");
         Debug.Log($"Is room open : {PhotonNetwork.CurrentRoom.IsOpen}");
+        _ui.IsInLobby = PhotonNetwork.InLobby;
+        _ui.UpdateCurrentRoomInfo(PhotonNetwork.CurrentRoom);
     }
 
     public override void OnJoinRandomFailed(short returnCode, string message)
@@ -108,6 +141,14 @@ public class RoomsController : MonoBehaviourPunCallbacks
         Debug.LogError($"Join fail : {message}");
     }
 
+    public override void OnCreatedRoom()
+    {
+        base.OnCreatedRoom();
+        Debug.LogFormat("<color=green>Call : {0}</color>", "OnCreatedRoom");
+        _ui.IsInLobby = PhotonNetwork.InLobby;
+        _ui.UpdateCurrentRoomInfo(PhotonNetwork.CurrentRoom);
+    }
+
     #endregion
 
 
@@ -120,10 +161,33 @@ public class RoomsController : MonoBehaviourPunCallbacks
 
     private void OnClickStartGameButtonHandler()
     {
-        PhotonNetwork.LocalPlayer.NickName = _userName;
-        var roomName = _ui.RoomName.text.Equals(string.Empty) ? $"Room {Random.Range(ROOM_NUMBER_MIN, ROOM_NUMBER_MAX)}" : _ui.RoomName.text;
-        var roomOptions = new RoomOptions { MaxPlayers = _ui.MaxPlayers, PlayerTtl = PLAYER_TTL, IsOpen = false };
+        if (!PhotonNetwork.IsConnectedAndReady)
+        {
+            OnClickCreateCustomRoomButtonHandler();
+        }
+
+        PhotonNetwork.CurrentRoom.IsOpen = false;
+        _ui.UpdateCurrentRoomInfo(PhotonNetwork.CurrentRoom);
+        Debug.LogFormat("<color=yellow>Call : {0}</color>", "START GAME");
+    }
+
+    private void OnClickCreateCustomRoomButtonHandler()
+    {
+        ConfigureRoom(out var roomName, out var roomOptions);
+        PhotonNetwork.JoinOrCreateRoom(roomName, roomOptions, PhotonNetwork.CurrentLobby);
+    }
+
+    private void OnClickCreateRandomRoomButtonHandler()
+    {
+        ConfigureRoom(out var roomName, out var roomOptions);
         PhotonNetwork.JoinRandomOrCreateRoom(roomName: roomName, roomOptions: roomOptions);
+    }
+
+    private void ConfigureRoom(out string roomName, out RoomOptions roomOptions)
+    {
+        PhotonNetwork.LocalPlayer.NickName = _userName;
+        roomName = _ui.RoomName.text.Equals(string.Empty) ? $"Room {Random.Range(ROOM_NUMBER_MIN, ROOM_NUMBER_MAX)}" : _ui.RoomName.text;
+        roomOptions = new RoomOptions { MaxPlayers = _ui.MaxPlayers, PlayerTtl = PLAYER_TTL, IsOpen = _ui.IsRoomLock };
     }
 
     private void Connect()

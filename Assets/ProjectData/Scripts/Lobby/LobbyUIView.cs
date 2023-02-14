@@ -3,7 +3,6 @@ using PlayFab.ClientModels;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
@@ -92,7 +91,7 @@ public sealed class LobbyUIView : MonoBehaviour
             $"Welcome back!\n\n" +
             $"PlayFabId : {result.AccountInfo.PlayFabId}\n\n" +
             $"Username : {result.AccountInfo.Username}\n\n" +
-            $"CustomId : {result.AccountInfo.CustomIdInfo.CustomId}\n\n" +
+            $"CustomId : {result.AccountInfo.CustomIdInfo?.CustomId}\n\n" +
             $"";
     }
 
