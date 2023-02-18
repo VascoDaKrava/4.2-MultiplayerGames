@@ -15,7 +15,7 @@ MonoBehaviour:
   TitleId: F3886
   DeveloperSecretKey: 4HZ6TKSE1BTD7BGXNIWXZW1RAXJ66TD63KF4CHMGZ8RWTMG4Z9
   ProductionEnvironmentUrl: 
-  RequestType: 2
+  RequestType: 0
   DisableDeviceInfo: 0
   DisableFocusTimeCollection: 0
   RequestTimeout: 2000

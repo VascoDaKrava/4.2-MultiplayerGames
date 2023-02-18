@@ -1,0 +1,60 @@
+{
+  "CatalogVersion": "NewCatalog",
+  "Catalog": [
+    {
+      "ItemId": "Wood",
+      "ItemClass": null,
+      "CatalogVersion": "NewCatalog",
+      "DisplayName": "Wood",
+      "Description": "Some wood",
+      "VirtualCurrencyPrices": {
+        "CO": 5
+      },
+      "RealCurrencyPrices": {},
+      "Tags": [],
+      "CustomData": "{}",
+      "Consumable": {
+        "UsageCount": null,
+        "UsagePeriod": null,
+        "UsagePeriodGroup": null
+      },
+      "Container": null,
+      "Bundle": null,
+      "CanBecomeCharacter": false,
+      "IsStackable": false,
+      "IsTradable": false,
+      "ItemImageUrl": null,
+      "IsLimitedEdition": false,
+      "InitialLimitedEditionCount": 0,
+      "ActivatedMembership": null
+    },
+    {
+      "ItemId": "Banana",
+      "ItemClass": null,
+      "CatalogVersion": "NewCatalog",
+      "DisplayName": "Banana",
+      "Description": "Some banana",
+      "VirtualCurrencyPrices": {
+        "CO": 10
+      },
+      "RealCurrencyPrices": {},
+      "Tags": [],
+      "CustomData": null,
+      "Consumable": {
+        "UsageCount": null,
+        "UsagePeriod": null,
+        "UsagePeriodGroup": null
+      },
+      "Container": null,
+      "Bundle": null,
+      "CanBecomeCharacter": false,
+      "IsStackable": false,
+      "IsTradable": false,
+      "ItemImageUrl": "https://disk.yandex.ru/i/rIXBAiP52lF7gg",
+      "IsLimitedEdition": false,
+      "InitialLimitedEditionCount": 0,
+      "ActivatedMembership": null
+    }
+  ],
+  "DropTables": []
+}
