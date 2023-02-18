@@ -407,7 +407,7 @@ GameObject:
   - component: {fileID: 11484610}
   - component: {fileID: 11413802}
   m_Layer: 0
-  m_Name: My Robot Kyle -done-
+  m_Name: MyRobotKyle
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -494,7 +494,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Health: 1
-  playerUiPrefab: {fileID: 170056, guid: e41946a981c3b444a84d15eb7c608ca4, type: 3}
+  playerUiPrefab: {fileID: 170056, guid: d659de1b5bc0a364389aafcd1e41d865, type: 3}
   beams: {fileID: 170262}
 --- !u!114 &11400008
 MonoBehaviour:

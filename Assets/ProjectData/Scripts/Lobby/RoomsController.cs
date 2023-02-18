@@ -41,6 +41,8 @@ public class RoomsController : MonoBehaviourPunCallbacks
 
     #region Fields
 
+    private const string SCENE_GAME_NAME = "Game";
+
     private const int ROOM_NUMBER_MIN = 1000;
     private const int ROOM_NUMBER_MAX = 10000;
     private const byte MAX_PLAYERS_MIN = 2;
@@ -78,7 +80,6 @@ public class RoomsController : MonoBehaviourPunCallbacks
         _ui.CreateOrJoinCustomRoomButton.onClick.RemoveAllListeners();
         _ui.CreateOrJoinRandomRoomButton.onClick.RemoveAllListeners();
         _ui.IsRoomLock.onValueChanged.RemoveAllListeners();
-        Disconnect();
     }
 
     #endregion
@@ -98,6 +99,8 @@ public class RoomsController : MonoBehaviourPunCallbacks
         base.OnJoinedLobby();
         Debug.Log("OnJoinedLobby");
         _ui.IsInLobby = PhotonNetwork.InLobby;
+
+        PhotonNetwork.LocalPlayer.NickName = string.IsNullOrEmpty(_userName) ? PhotonNetwork.LocalPlayer.UserId : _userName;
     }
 
     public override void OnLeftLobby()
@@ -185,6 +188,11 @@ public class RoomsController : MonoBehaviourPunCallbacks
         PhotonNetwork.CurrentRoom.IsOpen = false;
         _ui.UpdateCurrentRoomInfo(PhotonNetwork.CurrentRoom, PhotonNetwork.CurrentRoom.PlayerCount);
         Debug.LogFormat("<color=yellow>Call : {0}</color>", "START GAME");
+
+        if (PhotonNetwork.IsMasterClient)
+        {
+            PhotonNetwork.LoadLevel(SCENE_GAME_NAME);
+        }
     }
 
     private void OnClickCreateCustomRoomButtonHandler()
@@ -228,12 +236,6 @@ public class RoomsController : MonoBehaviourPunCallbacks
         PhotonNetwork.ConnectUsingSettings();
         PhotonNetwork.GameVersion = PhotonNetwork.AppVersion;
         Debug.Log("Connect to PUN");
-    }
-
-    private void Disconnect()
-    {
-        PhotonNetwork.Disconnect();
-        Debug.Log("Disconnect from PUN");
     }
 
     private void OnUIvalueChangeRoomLockHandler(bool state)
