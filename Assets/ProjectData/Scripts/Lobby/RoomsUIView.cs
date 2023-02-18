@@ -1,3 +1,4 @@
+using Photon.Pun;
 using Photon.Realtime;
 using System.Collections.Generic;
 using TMPro;
@@ -62,12 +63,17 @@ public sealed class RoomsUIView : MonoBehaviour
 
     #region Methods
 
-    public void UpdateCurrentRoomInfo(RoomInfo room)
+    /// <summary>
+    /// Update UI with current room info
+    /// </summary>
+    /// <param name="room">Current room</param>
+    /// <param name="playersCount">Count of exist players - cannot get from "room"-parameter</param>
+    public void UpdateCurrentRoomInfo(RoomInfo room, int playersCount)
     {
         _currentRoomName.text = $"Room name : {room.Name}";
         _currentRoomLock.text = $"Room {(room.IsOpen ? "opened" : "closed")}.";
-        _currentRoomMembers.text = $"Players : {room.PlayerCount} / {room.MaxPlayers}";
-        Debug.Log($"Players : {room.PlayerCount} / {room.MaxPlayers}");
+        _currentRoomMembers.text = $"Players : {playersCount} / {room.MaxPlayers}";
+        Debug.Log($"Players : {PhotonNetwork.CurrentRoom.PlayerCount} / {room.MaxPlayers}");
     }
 
     public void FillRooms(List<RoomInfo> roomListNew)

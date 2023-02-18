@@ -120,7 +120,7 @@ public class RoomsController : MonoBehaviourPunCallbacks
         Debug.LogFormat("<color=aqua>Joined NickName : {0}</color>", otherPlayer.NickName);
         Debug.LogFormat("<color=cyan>Full : {0}</color>", otherPlayer.ToStringFull());
         _ui.IsInLobby = PhotonNetwork.InLobby;
-        _ui.UpdateCurrentRoomInfo(PhotonNetwork.CurrentRoom);
+        _ui.UpdateCurrentRoomInfo(PhotonNetwork.CurrentRoom, PhotonNetwork.CurrentRoom.PlayerCount);
     }
 
     public override void OnJoinedRoom()
@@ -130,7 +130,7 @@ public class RoomsController : MonoBehaviourPunCallbacks
         Debug.Log($"Max players {PhotonNetwork.CurrentRoom.MaxPlayers}");
         Debug.Log($"Is room open : {PhotonNetwork.CurrentRoom.IsOpen}");
         _ui.IsInLobby = PhotonNetwork.InLobby;
-        _ui.UpdateCurrentRoomInfo(PhotonNetwork.CurrentRoom);
+        _ui.UpdateCurrentRoomInfo(PhotonNetwork.CurrentRoom, PhotonNetwork.CurrentRoom.PlayerCount);
     }
 
     public override void OnJoinRandomFailed(short returnCode, string message)
@@ -150,7 +150,7 @@ public class RoomsController : MonoBehaviourPunCallbacks
         base.OnCreatedRoom();
         Debug.LogFormat("<color=green>Call : {0}</color>", "OnCreatedRoom");
         _ui.IsInLobby = PhotonNetwork.InLobby;
-        _ui.UpdateCurrentRoomInfo(PhotonNetwork.CurrentRoom);
+        _ui.UpdateCurrentRoomInfo(PhotonNetwork.CurrentRoom, PhotonNetwork.CurrentRoom.PlayerCount);
     }
 
     #endregion
@@ -171,7 +171,7 @@ public class RoomsController : MonoBehaviourPunCallbacks
         }
 
         PhotonNetwork.CurrentRoom.IsOpen = false;
-        _ui.UpdateCurrentRoomInfo(PhotonNetwork.CurrentRoom);
+        _ui.UpdateCurrentRoomInfo(PhotonNetwork.CurrentRoom, PhotonNetwork.CurrentRoom.PlayerCount);
         Debug.LogFormat("<color=yellow>Call : {0}</color>", "START GAME");
     }
 
@@ -232,7 +232,7 @@ public class RoomsController : MonoBehaviourPunCallbacks
         }
 
         PhotonNetwork.CurrentRoom.IsOpen = !state;
-        _ui.UpdateCurrentRoomInfo(PhotonNetwork.CurrentRoom);
+        _ui.UpdateCurrentRoomInfo(PhotonNetwork.CurrentRoom, PhotonNetwork.CurrentRoom.PlayerCount);
     }
 
     #endregion
