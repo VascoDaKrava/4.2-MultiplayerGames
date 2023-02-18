@@ -5,6 +5,7 @@ using System;
 using UnityEngine.SceneManagement;
 using System.Collections;
 
+
 public sealed class ServerAuthorization : MonoBehaviour
 {
 
