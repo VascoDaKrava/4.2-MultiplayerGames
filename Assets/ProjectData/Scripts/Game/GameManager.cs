@@ -1,7 +1,9 @@
 using Photon.Pun;
+using PlayFab.ClientModels;
+using PlayFab;
 using UnityEngine;
 using UnityEngine.UI;
-
+using System.Collections.Generic;
 
 public sealed class GameManager : MonoBehaviourPunCallbacks
 {
@@ -9,6 +11,9 @@ public sealed class GameManager : MonoBehaviourPunCallbacks
     #region Fields
 
     private const string SCENE_LOBBY_NAME = "Lobby";
+    private const string PLAYFAB_HEALTH_KEY = "HP";
+
+    private PlayerManager_Demo _player;
 
     [SerializeField] private Button _exitButton;
 
@@ -22,7 +27,9 @@ public sealed class GameManager : MonoBehaviourPunCallbacks
 
     private void Start()
     {
-        PhotonNetwork.Instantiate(_playerPrefab.name, new Vector3(0f, 5f, 0f), Quaternion.identity, 0);
+        _player = PhotonNetwork.Instantiate(_playerPrefab.name, new Vector3(0f, 5f, 0f), Quaternion.identity, 0).GetComponent<PlayerManager_Demo>();
+
+        PlayFabClientAPI.GetAccountInfo(new GetAccountInfoRequest(), OnGetAccountInfo, error => Debug.LogError(error.GenerateErrorReport()));
     }
 
     #endregion
@@ -51,11 +58,68 @@ public sealed class GameManager : MonoBehaviourPunCallbacks
     #endregion
 
 
+    #region Playfab callbacks
+
+    private void OnGetAccountInfo(GetAccountInfoResult result)
+    {
+        PlayFabClientAPI.GetUserData(new GetUserDataRequest()
+        {
+            PlayFabId = result.AccountInfo.PlayFabId,
+            Keys = null
+        },
+        OnGetUserDataPlayfab,
+        error => Debug.Log(error.GenerateErrorReport())
+        );
+    }
+
+    #endregion
+
+
     #region Methods
+
+    public void LeaveRoom()
+    {
+        if (PlayFabClientAPI.IsClientLoggedIn())
+        {
+            PlayFabClientAPI.UpdateUserData(new UpdateUserDataRequest()
+            {
+                Data = new Dictionary<string, string>() {
+                    {PLAYFAB_HEALTH_KEY, _player.Health.ToString()}
+                }
+            },
+            result => Debug.Log("Successfully updated user data"),
+            error => Debug.Log(error.GenerateErrorReport())
+            );
+        }
+
+        PhotonNetwork.LeaveRoom();
+    }
 
     private void OnExitButtonClickHandler()
     {
-        PhotonNetwork.LeaveRoom();
+        LeaveRoom();
+    }
+
+    private void OnGetUserDataPlayfab(GetUserDataResult userData)
+    {
+        Debug.Log("OnGetUserDataPlayfab");
+
+        if (userData.Data.TryGetValue(PLAYFAB_HEALTH_KEY, out var data))
+        {
+            Debug.Log($"Get {PLAYFAB_HEALTH_KEY}: {data.Value}");
+            if (float.TryParse(data.Value, out var health))
+            {
+                _player.Health = health;//SetHealth(health);
+            }
+            else
+            {
+                Debug.LogError("Cannot parse health");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("No health. Use default!");
+        }
     }
 
     #endregion

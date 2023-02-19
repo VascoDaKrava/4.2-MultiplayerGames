@@ -400,12 +400,12 @@ GameObject:
   - component: {fileID: 9500000}
   - component: {fileID: 14300000}
   - component: {fileID: 11454274}
-  - component: {fileID: 11449706}
   - component: {fileID: 11400008}
   - component: {fileID: 11400010}
   - component: {fileID: 5484970}
   - component: {fileID: 11484610}
   - component: {fileID: 11413802}
+  - component: {fileID: 5615477182447683287}
   m_Layer: 0
   m_Name: MyRobotKyle
   m_TagString: Player
@@ -481,21 +481,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   directionDampTime: 0.25
---- !u!114 &11449706
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 100030}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 98fac77b304554f238a61572f5720187, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Health: 1
-  playerUiPrefab: {fileID: 170056, guid: d659de1b5bc0a364389aafcd1e41d865, type: 3}
-  beams: {fileID: 170262}
 --- !u!114 &11400008
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -515,9 +500,9 @@ MonoBehaviour:
   OwnershipTransfer: 0
   observableSearch: 2
   ObservedComponents:
-  - {fileID: 11449706}
   - {fileID: 11400010}
   - {fileID: 11413802}
+  - {fileID: 5615477182447683287}
   sceneViewId: 0
   InstantiationId: 1
   isRuntimeInstantiated: 0
@@ -602,6 +587,22 @@ MonoBehaviour:
     LayerIndex: 0
   - SynchronizeType: 0
     LayerIndex: 1
+--- !u!114 &5615477182447683287
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 100030}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81c17cb8d7724ca41ace862b68f5db5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _gameManager: {fileID: 0}
+  _health: 0.8
+  playerUiPrefab: {fileID: 170056, guid: d659de1b5bc0a364389aafcd1e41d865, type: 3}
+  beams: {fileID: 170262}
 --- !u!1 &100032
 GameObject:
   m_ObjectHideFlags: 0

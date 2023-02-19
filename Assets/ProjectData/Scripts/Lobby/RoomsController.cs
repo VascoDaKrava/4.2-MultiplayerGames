@@ -99,8 +99,6 @@ public class RoomsController : MonoBehaviourPunCallbacks
         base.OnJoinedLobby();
         Debug.Log("OnJoinedLobby");
         _ui.IsInLobby = PhotonNetwork.InLobby;
-
-        PhotonNetwork.LocalPlayer.NickName = string.IsNullOrEmpty(_userName) ? PhotonNetwork.LocalPlayer.UserId : _userName;
     }
 
     public override void OnLeftLobby()
@@ -133,6 +131,12 @@ public class RoomsController : MonoBehaviourPunCallbacks
         Debug.Log($"Max players {PhotonNetwork.CurrentRoom.MaxPlayers}");
         Debug.Log($"Is room open : {PhotonNetwork.CurrentRoom.IsOpen}");
         _ui.IsInLobby = PhotonNetwork.InLobby;
+
+        if (string.IsNullOrEmpty(PhotonNetwork.LocalPlayer.NickName))
+        {
+            PhotonNetwork.LocalPlayer.NickName = string.IsNullOrEmpty(_userName) ? PhotonNetwork.LocalPlayer.UserId : _userName;
+        }
+
         _ui.UpdateCurrentRoomInfo(PhotonNetwork.CurrentRoom, PhotonNetwork.CurrentRoom.PlayerCount);
     }
 
