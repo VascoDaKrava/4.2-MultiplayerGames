@@ -55,17 +55,13 @@ public sealed class CharactersUIView : MonoBehaviour
         SetPropertiesActive(false);
     }
 
+    /// <summary>
+    /// Allow/disallow creating new character
+    /// </summary>
+    /// <param name="state"></param>
     public void SetNewCharacterActive(bool state)
     {
-        if (state)
-        {
-            _newCharacterNameInputField.ActivateInputField();
-        }
-        else
-        {
-            _newCharacterNameInputField.DeactivateInputField();
-        }
-
+        _newCharacterNameInputField.interactable = state;
         CreateNewCharacterButton.interactable = state;
     }
 
@@ -74,7 +70,7 @@ public sealed class CharactersUIView : MonoBehaviour
         foreach (var item in _charactersDictionary.Keys)
         {
             item.OnClickItem -= OnCharacterItemButtonClickHandler;
-            Destroy(item.transform);
+            Destroy(item.transform.gameObject);
         }
 
         _charactersDictionary.Clear();
@@ -87,6 +83,8 @@ public sealed class CharactersUIView : MonoBehaviour
             character.OnClickItem += OnCharacterItemButtonClickHandler;
             _charactersDictionary.Add(character, characterData);
         }
+
+        _charactersContainer.gameObject.SetActive(true);
     }
 
     private void OnCharacterItemButtonClickHandler(CharacterItemUIView characterItemUI)
@@ -95,6 +93,10 @@ public sealed class CharactersUIView : MonoBehaviour
         OnCharacterChange?.Invoke(_charactersDictionary[characterItemUI]);
     }
 
+    /// <summary>
+    /// Show properties for current character
+    /// </summary>
+    /// <param name="state"></param>
     private void SetPropertiesActive(bool state)
     {
         _damage.gameObject.SetActive(state);

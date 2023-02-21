@@ -1,6 +1,5 @@
 using PlayFab;
 using PlayFab.ClientModels;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,17 +9,19 @@ public sealed class CharactersController : MonoBehaviour
 
     #region Fields
 
-    private const string CATALOG_VERSION = "NewCatalog";// Version/name as PlayFab web creation. Same as CatalogLoader.cs
+    private const string CATALOG_VERSION_MASTER = "NewCatalog";// Only there item can converted into character.
+    private const string CATALOG_VERSION = "NewCatalog";// Version/name as PlayFab web creation. Same as CatalogLoader.cs, but not work with GrantCharacterToUser
     private const string NEW_CHARACTER_ITEM_ID = "Master";//item ID for purchase
     private const string VIRTUAL_CURRENCY = "CO";// use this currency for purchase
+    private const int PRICE = 100;// price of item for purchase
 
-    //private string itemId;
+    private const int MAX_CHARACTERS = 2;
 
     [SerializeField] private CharactersUIView _view;
-    [SerializeField] private int _maxCharacters = 2;
 
     private List<CharacterData> _characters = new List<CharacterData>();
-    private CharacterData _currentCharacter = new CharacterData();
+    private CharacterData _currentCharacter;
+    private string _newCharacterName = "Bob";
 
     #endregion
 
@@ -30,10 +31,10 @@ public sealed class CharactersController : MonoBehaviour
     private void Start()
     {
         GetCharacters();
-        _view.MaxCharacters = _maxCharacters;
+        _view.MaxCharacters = MAX_CHARACTERS;
         _view.ExistsCharacters = _characters.Count;
 
-        if (_characters.Count < _maxCharacters)
+        if (_characters.Count < MAX_CHARACTERS)
         {
             _view.SetNewCharacterActive(true);
         }
@@ -41,18 +42,13 @@ public sealed class CharactersController : MonoBehaviour
 
     private void OnEnable()
     {
-        _view.OnCharacterChange += _view_OnCharacterChange;
+        _view.OnCharacterChange += OnCharacterChangeHandler;
         _view.CreateNewCharacterButton.onClick.AddListener(OnCreateNewCharacterButtonClickHandler);
-    }
-
-    private void _view_OnCharacterChange(CharacterData obj)
-    {
-        throw new System.NotImplementedException();
     }
 
     private void OnDisable()
     {
-        _view.OnCharacterChange -= _view_OnCharacterChange;
+        _view.OnCharacterChange -= OnCharacterChangeHandler;
         _view.CreateNewCharacterButton.onClick.RemoveAllListeners();
     }
 
@@ -85,6 +81,17 @@ public sealed class CharactersController : MonoBehaviour
                 Name = item.CharacterName,
             });
         }
+
+        _view.FillCharacters(_characters.ToArray());
+
+        if (_characters.Count >= MAX_CHARACTERS)
+        {
+            _view.SetNewCharacterActive(false);
+        }
+
+        _view.ExistsCharacters = _characters.Count;
+        _currentCharacter ??= _characters[0];
+        _view.SetCurrentCharacterData(_currentCharacter);
     }
 
     private void OnPurchaseItem(PurchaseItemResult result)
@@ -101,13 +108,50 @@ public sealed class CharactersController : MonoBehaviour
     private void OnGetUserInventory(GetUserInventoryResult result)
     {
         Debug.Log("OnGetUserInventory");
-        
+        string itemInstanceId = default;
+
+        foreach (var itemInstance in result.Inventory)
+        {
+            if (itemInstance.ItemId == NEW_CHARACTER_ITEM_ID)
+            {
+                itemInstanceId = itemInstance.ItemInstanceId;
+                Debug.Log("Find NEW_CHARACTER_ITEM_ID in inventory");
+                break;
+            }
+        }
+
+        if (string.IsNullOrEmpty(itemInstanceId))
+        {
+            Debug.LogError("No tokens for new Character");
+            return;
+        }
+
+        PlayFabClientAPI.GrantCharacterToUser(
+            new GrantCharacterToUserRequest
+            {
+                CharacterName = _newCharacterName,
+                ItemId = NEW_CHARACTER_ITEM_ID,
+                CatalogVersion = CATALOG_VERSION_MASTER,
+            },
+            result => UpdateCharacterStatistics(result.CharacterId),
+            error =>
+            {
+                Debug.LogError(error.GenerateErrorReport());
+            });
+
+        GetCharacters();
     }
 
     #endregion
 
 
     #region Methods
+
+    private void OnCharacterChangeHandler(CharacterData character)
+    {
+        Debug.Log("Select " + character.Name);
+        _currentCharacter = character;
+    }
 
     private void MakePurchaseNewCharacter()
     {
@@ -116,9 +160,10 @@ public sealed class CharactersController : MonoBehaviour
         PlayFabClientAPI.PurchaseItem(
             new PurchaseItemRequest
             {
-                CatalogVersion = CATALOG_VERSION,
+                CatalogVersion = CATALOG_VERSION_MASTER,
                 ItemId = NEW_CHARACTER_ITEM_ID,
                 VirtualCurrency = VIRTUAL_CURRENCY,
+                Price = PRICE
             },
             OnPurchaseItem,
             Debug.LogError
@@ -127,46 +172,55 @@ public sealed class CharactersController : MonoBehaviour
 
     private void OnCreateNewCharacterButtonClickHandler()
     {
-        _currentCharacter.Name = _view.InputedCharacterName;
-        Debug.Log("Create new " + _currentCharacter.Name);
+        if (!string.IsNullOrEmpty(_view.InputedCharacterName))
+        {
+            _newCharacterName = _view.InputedCharacterName;
+        }
+
+        Debug.Log("Create new " + _newCharacterName);
 
         MakePurchaseNewCharacter();
-
-        //PlayFabClientAPI.GrantCharacterToUser(new GrantCharacterToUserRequest
-        //{
-        //    CharacterName = _currentCharacter.Name,
-        //    ItemId = itemId
-        //},
-        //result => UpdateCharacterStatistics(result.CharacterId),
-        //Debug.LogError);
     }
-
-
 
     private void UpdateCharacterStatistics(string characterId)
     {
-        PlayFabClientAPI.UpdateCharacterStatistics(new UpdateCharacterStatisticsRequest
+        int damage = default;
+        int health = default;
+        int xp = default;
+
+        if (_currentCharacter != null)
         {
-            CharacterId = characterId,
-            CharacterStatistics = new Dictionary<string, int>
+            if (string.Equals(characterId, _currentCharacter.CharacterId))
+            {
+                damage = _currentCharacter.Damage;
+                health = (int)(_currentCharacter.Health * 100.0f);
+                xp = _currentCharacter.Experience;
+            }
+        }
+
+        PlayFabClientAPI.UpdateCharacterStatistics(
+            new UpdateCharacterStatisticsRequest
+            {
+                CharacterId = characterId,
+                CharacterStatistics = new Dictionary<string, int>
                 {
-                    {"Level", 1},
-                    {"XP", 0},
-                    {"Gold", 0}
+                    {"Damage", damage},
+                    {"Health", health},
+                    {"XP", xp}
                 }
-        },
-        result =>
-        {
-            Debug.Log($"Initial stats set, telling client to update character list");
-        },
-        Debug.LogError);
+            },
+            success => GetCharacters(),
+            Debug.LogError);
     }
 
     private void GetCharacters()
     {
+        Debug.Log("GetCharacters");
+
         if (PlayFabClientAPI.IsClientLoggedIn())
         {
-            PlayFabClientAPI.GetAllUsersCharacters(new ListUsersCharactersRequest(),
+            PlayFabClientAPI.GetAllUsersCharacters(
+                new ListUsersCharactersRequest(),
                 OnGetCharacters,
                 error => Debug.LogError(error.GenerateErrorReport())
                 );
