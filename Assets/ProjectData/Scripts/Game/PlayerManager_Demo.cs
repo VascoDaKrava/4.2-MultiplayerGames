@@ -28,14 +28,14 @@ public sealed class PlayerManager_Demo : MonoBehaviourPunCallbacks, IPunObservab
 
     [Tooltip("The current Health of our player")]
     [SerializeField] private float _health = 0.9f;
-    
+
     public float Health
     {
         get { return _health; }
         set
         {
             _health = value;
-            
+
             if (_health < 0.0f)
             {
                 _gameManager.LeaveRoom();
@@ -45,7 +45,7 @@ public sealed class PlayerManager_Demo : MonoBehaviourPunCallbacks, IPunObservab
 
     [Tooltip("The local player instance. Use this to know if the local player is represented in the Scene")]
     public static GameObject LocalPlayerInstance;
-        
+
     [Tooltip("The Player's UI GameObject Prefab")]
     [SerializeField]
     private GameObject playerUiPrefab;
@@ -307,16 +307,6 @@ public sealed class PlayerManager_Demo : MonoBehaviourPunCallbacks, IPunObservab
             this.Health = (float)stream.ReceiveNext();
         }
     }
-
-    #endregion
-
-
-    #region Methods
-
-    //public void SetHealth(float value)
-    //{
-    //    _health = value;
-    //}
 
     #endregion
 
